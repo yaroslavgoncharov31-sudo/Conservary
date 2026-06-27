@@ -1,17 +1,10 @@
 import Foundation
 
-struct NetworkingService {
+struct RAWGSearchProvider: SearchProvider {
 
-    static func readQuery() -> String? {
-        guard let input = readLine(), !input.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-        else {
-            print("Invalid input.")
-            return nil
-        }
-        return input
-    }
+    typealias Reply = Game
 
-    static func buildURL(query: String) throws -> URL {
+    func buildURL(query: String) throws -> URL {
         guard
             let url = URL(string: "https://api.rawg.io/api/games?key=\(rawgAPIKey)&search=\(query)")
         else {
@@ -20,7 +13,7 @@ struct NetworkingService {
         return url
     }
 
-    static func searchGames(query: String) async throws -> [Game] {
+    func search(query: String) async throws -> [Game] {
         let url = try buildURL(query: query)
         let data = try await APIClient.shared.get(url: url)
         let result = try JSONDecoder().decode(GameSearchResponse.self, from: data).results
