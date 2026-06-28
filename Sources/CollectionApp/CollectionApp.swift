@@ -4,6 +4,6 @@
 @main
 struct CollectionApp {
     static func main() async throws {
-
+        
     }
 }
