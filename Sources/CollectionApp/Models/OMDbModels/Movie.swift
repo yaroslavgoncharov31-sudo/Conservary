@@ -5,7 +5,7 @@ struct Movie: Codable {
     let year: String
     let imdbID: String
     let type: String
-    let poster: String
+    let poster: String?
 
     private enum CodingKeys: String, CodingKey {
         case title = "Title"
@@ -25,5 +25,23 @@ struct MovieSearchResponse: Codable {
         case results = "Search"
         case totalResults = "totalResults"
         case response = "Response"
+    }
+}
+
+extension Movie: ConvertibleToCollectionItem {
+    func toCollectionItem(collectionID: UUID) async throws -> CollectionItem {
+        guard let validPoster = poster else {
+            return CollectionItem(
+            collectionID: collectionID, id: UUID(), name: self.title, dateOfCreation: .now, note: "",
+            photo: nil, category: .films)
+        }
+        guard let imageURL = URL(string: validPoster) else {
+            throw NetworkingError.invalidURL
+        }
+        let imageData = try await APIClient.shared.get(url: imageURL)
+
+        return CollectionItem(
+            collectionID: collectionID, id: UUID(), name: self.title, dateOfCreation: .now, note: "",
+            photo: imageData, category: .films)
     }
 }

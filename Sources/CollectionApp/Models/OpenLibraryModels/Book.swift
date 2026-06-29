@@ -22,3 +22,20 @@ struct BookSearchResponse: Codable {
         case results = "docs"
     }
 }
+extension Book: ConvertibleToCollectionItem {
+    func toCollectionItem(collectionID: UUID) async throws -> CollectionItem {
+        guard let validCover = coverI else {
+             return CollectionItem(
+            collectionID: collectionID, id: UUID(), name: self.title, dateOfCreation: .now, note: "",
+            photo: nil, category: .books)
+        }
+        guard let imageURL = URL(string: "https://covers.openlibrary.org/b/id/\(validCover)-M.jpg") else {
+            throw NetworkingError.invalidURL
+        }
+        let imageData: Data? = try await APIClient.shared.get(url: imageURL)
+
+        return CollectionItem(
+            collectionID: collectionID, id: UUID(), name: self.title, dateOfCreation: .now, note: "",
+            photo: imageData, category: .books)
+    }
+}

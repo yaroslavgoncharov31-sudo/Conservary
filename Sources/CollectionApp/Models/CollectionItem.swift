@@ -6,6 +6,6 @@ struct CollectionItem: Storable {
     var name: String
     let dateOfCreation: Date
     var note: String
-    var photo: Data 
+    var photo: Data? 
     let category: ItemCategory
 }

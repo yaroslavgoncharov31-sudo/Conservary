@@ -2,7 +2,7 @@ import Foundation
 
 struct Release: Codable {
     let id: Int
-    let title: String?
+    let title: String
     let year: String?
     let coverImage: String?
     let type: String?
@@ -17,4 +17,21 @@ struct Release: Codable {
 }
 struct ReleaseSearchResponse: Codable {
     let results: [Release]
+}
+extension Release: ConvertibleToCollectionItem {
+    func toCollectionItem(collectionID: UUID) async throws -> CollectionItem {
+        guard let validCoverImage = coverImage else {
+            return CollectionItem(
+            collectionID: collectionID, id: UUID(), name: self.title, dateOfCreation: .now, note: "",
+            photo: nil, category: .vinyl)
+        }
+        guard let imageURL = URL(string: validCoverImage) else {
+            throw NetworkingError.invalidURL
+        }
+        let imageData = try await APIClient.shared.get(url: imageURL)
+
+        return CollectionItem(
+            collectionID: collectionID, id: UUID(), name: self.title, dateOfCreation: .now, note: "",
+            photo: imageData, category: .vinyl)
+    }
 }
